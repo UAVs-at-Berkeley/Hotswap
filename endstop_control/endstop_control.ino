@@ -1,3 +1,4 @@
+#include <AccelStepper.h>
 #include <MultiStepper.h>
 
 #include <AccelStepper.h>
@@ -26,6 +27,10 @@ void release() {
   belt_stepper->release();
 }
 
+int state = 0;
+
+int location = 0;
+
 void setup() {
   // put your setup code here, to run once: 
   pinMode(startStop, INPUT);  
@@ -45,12 +50,39 @@ void setup() {
     sts = digitalRead(startStop);
   }
   release();
+
+  location = 0;
   
+  state = 0;
 }
 
 int startStopState = 0;
 
+// ALTERNATES between going to end or start stop
 void loop() {
-  // put your main code here, to run repeatedly:
+  delay(1500);
   
+  if (state == 0) {
+    int est = digitalRead(endStop);
+    while(!est) {
+      forward();
+      delay(10);
+      est = digitalRead(endStop);
+    }
+    release();
+    state = 1;
+  } 
+  else {
+
+    int sts = digitalRead(startStop);
+    while(!sts) {
+      back();
+      delay(10);
+      sts = digitalRead(startStop);
+    }
+    release();
+    state = 0;
+  }
+  
+  delay(1500);
 }
